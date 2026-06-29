@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S8 · El arte de preguntar: nuestros primeros prompts · IA en primarIA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --azul-oscuro: #0d2244;
+      --azul-medio: #1a3a6e;
+      --azul: #2563c0;
+      --dorado: #f59e0b;
+      --dorado-claro: #fcd34d;
+      --blanco: #ffffff;
+      --gris-claro: #d1d5db;
+      --rojo: #dc2626;
+      --verde: #059669;
+      --morado: #7c3aed;
+      --naranja: #ea580c;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Baloo 2', cursive; }
+
+    /* ── NAV BAR ── */
+    .nav-bar {
+      background: var(--azul-medio);
+      border-bottom: 2px solid var(--dorado);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 1rem;
+      flex-shrink: 0;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-logo {
+      font-family: 'Baloo 2', cursive;
+      font-size: 0.8rem;
+      color: var(--dorado);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid rgba(245,158,11,0.35);
+      color: var(--gris-claro);
+      padding: 0.22rem 0.55rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      border-color: var(--dorado);
+    }
+
+    .tab-home {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      border-color: var(--dorado);
+      font-size: 0.95rem;
+      padding: 0.22rem 0.5rem;
+    }
+
+    /* ── ALERT BAR ── */
+    .alert-bar {
+      background: var(--rojo);
+      color: #fff;
+      text-align: center;
+      padding: 0.3rem 1rem;
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+      display: none;
+      letter-spacing: 0.02em;
+    }
+
+    .alert-bar.on { display: block; }
+
+    /* ── MAIN & SCREENS ── */
+    .main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+    }
+
+    .screen.active { display: flex; }
+
+    /* ── SCROLLABLE CONTENT AREA ── */
+    .screen-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.1rem 1.8rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--dorado) transparent;
+    }
+
+    /* ── LICENSE FOOTER ── */
+    .lic {
+      background: rgba(0,0,0,0.35);
+      text-align: center;
+      padding: 0.28rem 1rem;
+      font-size: 0.62rem;
+      color: rgba(245,158,11,0.65);
+      flex-shrink: 0;
+      letter-spacing: 0.015em;
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────
+       PORTADA / COVER
+    ───────────────────────────── */
+    .cover-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      background: radial-gradient(ellipse at 50% 30%, #1a3a6e 0%, #0d2244 70%);
+    }
+
+    .cover-emojis {
+      font-size: 2.6rem;
+      letter-spacing: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .cover-badge {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      font-size: 0.88rem;
+      padding: 0.25rem 1.1rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.03em;
+    }
+
+    .cover-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--dorado);
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+
+    .cover-sub {
+      font-size: 1rem;
+      color: var(--gris-claro);
+      margin-bottom: 0.3rem;
+    }
+
+    .cover-meta {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 1.4rem;
+    }
+
+    .cover-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.6rem;
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto 1.2rem;
+    }
+
+    .cover-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: var(--blanco);
+      border-radius: 10px;
+      padding: 0.7rem 0.4rem;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      transition: all 0.18s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .cover-btn:hover {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      border-color: var(--dorado);
+      transform: translateY(-2px);
+    }
+
+    .cover-btn .emoji { font-size: 1.4rem; }
+    .cover-btn .mins { font-size: 0.62rem; opacity: 0.75; margin-top: 0.1rem; }
+
+    .cover-lic {
+      font-size: 0.62rem;
+      color: rgba(245,158,11,0.55);
+      line-height: 1.7;
+    }
+
+    /* ─────────────────────────────
+       PHASE HEADER
+    ───────────────────────────── */
+    .phase-hdr {
+      background: var(--azul-medio);
+      border-bottom: 2px solid rgba(245,158,11,0.3);
+      padding: 0.6rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 0.75rem;
+    }
+
+    .phase-label {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.1rem;
+    }
+
+    .phase-name {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dorado);
+      line-height: 1.2;
+    }
+
+    /* ─────────────────────────────
+       TIMER
+    ───────────────────────────── */
+    .timer-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .timer-display {
+      background: var(--azul-oscuro);
+      border: 2px solid var(--dorado);
+      border-radius: 7px;
+      padding: 0.18rem 0.55rem;
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--dorado);
+      min-width: 58px;
+      text-align: center;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .timer-display.urgent { color: #f87171; border-color: #f87171; }
+
+    .tbtn {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      border: none;
+      border-radius: 6px;
+      padding: 0.22rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 800;
+      transition: background 0.15s;
+    }
+
+    .tbtn:hover { background: var(--dorado-claro); }
+    .tbtn.reset { background: rgba(255,255,255,0.15); color: var(--blanco); }
+    .tbtn.reset:hover { background: rgba(255,255,255,0.25); }
+
+    /* ─────────────────────────────
+       SHARED COMPONENTS
+    ───────────────────────────── */
+
+    /* Section title */
+    .stitle {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dorado);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin: 0.9rem 0 0.5rem;
+    }
+
+    /* Cards grid */
+    .cgrid { display: grid; gap: 0.7rem; margin-top: 0.5rem; }
+    .cgrid.c2 { grid-template-columns: 1fr 1fr; }
+    .cgrid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    /* Basic card */
+    .card {
+      background: var(--azul-medio);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 11px;
+      padding: 0.85rem 1rem;
+    }
+
+    .card-head {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      color: var(--dorado);
+      font-size: 0.88rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Reveal card */
+    .rcard {
+      background: rgba(37,99,192,0.25);
+      border: 2px solid rgba(37,99,192,0.5);
+      border-radius: 11px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .rcard:hover { border-color: rgba(245,158,11,0.7); }
+    .rcard.open { border-color: var(--dorado); }
+
+    .rcard-q {
+      padding: 0.65rem 0.9rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .rcard-a {
+      display: none;
+      background: rgba(245,158,11,0.08);
+      border-top: 1px solid rgba(245,158,11,0.3);
+      padding: 0.65rem 0.9rem;
+      font-size: 0.8rem;
+      color: var(--gris-claro);
+      line-height: 1.55;
+    }
+
+    .rcard.open .rcard-a { display: block; }
+
+    /* Nota docente */
+    .ndoc {
+      background: rgba(245,158,11,0.08);
+      border: 2px solid var(--dorado);
+      border-radius: 10px;
+      padding: 0.7rem 0.9rem;
+      margin: 0.7rem 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .ndoc-ttl {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      color: var(--dorado);
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Step cards */
+    .step { display: flex; align-items: flex-start; gap: 0.7rem; margin-bottom: 0.45rem; font-size: 0.82rem; background: var(--azul-medio); border: 1px solid rgba(245,158,11,0.2); border-radius: 9px; padding: 0.55rem 0.85rem; line-height: 1.5; }
+
+    .step-n {
+      background: var(--dorado);
+      color: var(--azul-oscuro);
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      font-size: 0.85rem;
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Prompt piece tags */
+    .ptag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 7px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 700;
+      margin: 0.2rem;
+    }
+
+    .pt-accion  { background: rgba(37,99,192,0.4);  border: 1px solid #2563c0; }
+    .pt-tema    { background: rgba(5,150,105,0.4);  border: 1px solid #059669; }
+    .pt-para    { background: rgba(124,58,237,0.4); border: 1px solid #7c3aed; }
+    .pt-formato { background: rgba(234,88,12,0.4);  border: 1px solid #ea580c; }
+    .pt-tono    { background: rgba(220,38,38,0.4);  border: 1px solid #dc2626; }
+    .pt-ext     { background: rgba(75,85,99,0.4);   border: 1px solid #4b5563; }
+
+    /* Reglas de oro */
+    .regla {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      background: var(--azul-medio);
+      border-left: 4px solid var(--dorado);
+      border-radius: 0 10px 10px 0;
+      padding: 0.55rem 0.9rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      transition: background 0.18s;
+      font-size: 0.84rem;
+    }
+
+    .regla:hover { background: rgba(245,158,11,0.1); }
+    .regla-e { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .regla-body strong { color: var(--dorado); display: block; }
+    .regla-sub { display: none; font-size: 0.76rem; color: var(--gris-claro); margin-top: 0.2rem; line-height: 1.45; }
+    .regla.open .regla-sub { display: block; }
+
+    /* Video button */
+    .vbtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 1.1rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s;
+    }
+
+    .vbtn:hover { background: #b91c1c; transform: translateY(-1px); }
+
+    /* Compare boxes */
+    .cbox-bad {
+      background: rgba(220,38,38,0.12);
+      border: 2px solid rgba(220,38,38,0.5);
+      border-radius: 11px;
+      padding: 0.9rem 1rem;
+    }
+
+    .cbox-good {
+      background: rgba(5,150,105,0.12);
+      border: 2px solid rgba(5,150,105,0.5);
+      border-radius: 11px;
+      padding: 0.9rem 1rem;
+    }
+
+    .cbox-label {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .cbox-bad .cbox-label { color: #f87171; }
+    .cbox-good .cbox-label { color: #34d399; }
+
+    .cbox-prompt {
+      font-size: 0.88rem;
+      margin-bottom: 0.4rem;
+      font-style: italic;
+    }
+
+    .cbox-desc { font-size: 0.74rem; color: rgba(255,255,255,0.55); }
+
+    /* Next session card */
+    .next-card {
+      background: linear-gradient(135deg, var(--azul-medio), #0f3460);
+      border: 2px solid var(--dorado);
+      border-radius: 13px;
+      padding: 0.9rem 1.1rem;
+      margin-top: 0.8rem;
+    }
+
+    .next-title {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      color: var(--dorado);
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+    }
+
+    /* Movie card */
+    .movie-card {
+      background: linear-gradient(135deg, #0f0f1a, #16213e);
+      border: 2px solid rgba(0,245,255,0.4);
+      border-radius: 13px;
+      padding: 1rem 1.1rem;
+      margin-top: 0.8rem;
+    }
+
+    .movie-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #00f5ff;
+      margin-bottom: 0.2rem;
+    }
+
+    .movie-tag {
+      background: rgba(0,245,255,0.12);
+      border: 1px solid rgba(0,245,255,0.4);
+      color: #00f5ff;
+      font-size: 0.67rem;
+      font-weight: 700;
+      padding: 0.12rem 0.6rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 0.6rem;
+    }
+
+    .movie-body {
+      font-size: 0.82rem;
+      color: var(--gris-claro);
+      line-height: 1.6;
+      margin-bottom: 0.6rem;
+    }
+
+    .movie-q {
+      background: rgba(0,245,255,0.08);
+      border-left: 3px solid #00f5ff;
+      padding: 0.55rem 0.8rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.82rem;
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* Etymology box */
+    .etym {
+      background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.04));
+      border: 2px solid var(--dorado);
+      border-radius: 13px;
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .etym-title {
+      font-family: 'Baloo 2', cursive;
+      font-weight: 800;
+      color: var(--dorado);
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .etym-body {
+      font-size: 0.84rem;
+      line-height: 1.65;
+    }
+
+    /* Reflection box */
+    .reflex {
+      background: rgba(37,99,192,0.2);
+      border: 2px solid rgba(37,99,192,0.5);
+      border-radius: 11px;
+      padding: 0.7rem 0.9rem;
+      font-size: 0.83rem;
+      margin-top: 0.7rem;
+      line-height: 1.5;
+    }
+
+    /* Scrollbar */
+    .screen-body::-webkit-scrollbar { width: 5px; }
+    .screen-body::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.4); border-radius: 3px; }
+    .screen-body::-webkit-scrollbar-track { background: transparent; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════ NAV BAR ══════════ -->
+  <div class="nav-bar">
+    <div class="nav-logo">🤖 IA en primarIA &nbsp;·&nbsp; S8 &nbsp;·&nbsp; 5.º de Primaria</div>
+    <div class="nav-tabs">
+      <button class="tab-btn tab-home" onclick="goTo('cover')" title="Inicio">🏠</button>
+      <button class="tab-btn" id="tab-f0" onclick="goTo('f0')">F0 · Repaso</button>
+      <button class="tab-btn" id="tab-f1" onclick="goTo('f1')">F1 · ¿Qué es?</button>
+      <button class="tab-btn" id="tab-f2" onclick="goTo('f2')">F2 · Taller</button>
+      <button class="tab-btn" id="tab-f3" onclick="goTo('f3')">F3 · Pizarra</button>
+      <button class="tab-btn" id="tab-f4" onclick="goTo('f4')">F4 · Cierre</button>
+    </div>
+  </div>
+
+  <!-- ══════════ ALERT BAR ══════════ -->
+  <div class="alert-bar" id="alertBar">
+    🚨 REGLA DE ORO &nbsp;·&nbsp; Solo el docente escribe y envía en Gemini &nbsp;·&nbsp; El alumnado no toca el teclado ni el dispositivo en ningún momento
+  </div>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <div class="main">
+
+    <!-- ───────────── PORTADA ───────────── -->
+    <div class="screen active" id="screen-cover" style="background: radial-gradient(ellipse at 50% 25%, #1a3a6e 0%, #0d2244 65%);">
+      <div class="cover-wrap">
+        <div class="cover-emojis">🎯 🤖 💬 📚 ✨</div>
+        <div class="cover-badge">Sesión 8 &nbsp;·&nbsp; 5.º de Primaria &nbsp;·&nbsp; 50 min &nbsp;·&nbsp; Práctica + Taller analógico</div>
+        <h1 class="cover-title">El arte de preguntar:<br>nuestros primeros prompts</h1>
+        <p class="cover-sub">Hoy aprendemos a hablar con la IA para obtener respuestas útiles</p>
+        <p class="cover-meta">CEIP San Fernando · Fuente del Rey · Dos Hermanas · Sevilla &nbsp;·&nbsp; Proyecto IA en primarIA</p>
+
+        <div class="cover-grid">
+          <button class="cover-btn" onclick="goTo('f0')">
+            <span class="emoji">🔄</span>
+            <span>Fase 0<br>Repaso</span>
+            <span class="mins">7 min</span>
+          </button>
+          <button class="cover-btn" onclick="goTo('f1')">
+            <span class="emoji">💡</span>
+            <span>Fase 1<br>¿Qué es?</span>
+            <span class="mins">8 min</span>
+          </button>
+          <button class="cover-btn" onclick="goTo('f2')">
+            <span class="emoji">🃏</span>
+            <span>Fase 2<br>Taller</span>
+            <span class="mins">12 min</span>
+          </button>
+          <button class="cover-btn" onclick="goTo('f3')">
+            <span class="emoji">🖥️</span>
+            <span>Fase 3<br>Pizarra</span>
+            <span class="mins">15 min</span>
+          </button>
+          <button class="cover-btn" onclick="goTo('f4')">
+            <span class="emoji">⭐</span>
+            <span>Fase 4<br>Cierre</span>
+            <span class="mins">8 min</span>
+          </button>
+        </div>
+
+        <div class="cover-lic">
+          © Luis Gómez Peñalver · CEIP San Fernando, Fuente del Rey, Dos Hermanas (Sevilla) · 2026<br>
+          Proyecto IA en primarIA · Este material se distribuye bajo licencia CC BY-NC-SA 4.0
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────────── FASE 0 · REPASO ───────────── -->
+    <div class="screen" id="screen-f0">
+      <div class="phase-hdr">
+        <div>
+          <div class="phase-label">FASE 0 &nbsp;·&nbsp; Gran grupo</div>
+          <div class="phase-name">🔄 Repaso: el camino recorrido (S1 → S7)</div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-display" id="td-f0">7:00</div>
+          <button class="tbtn" onclick="toggleTimer('f0',420)">▶ / ⏸</button>
+          <button class="tbtn reset" onclick="resetTimer('f0',420)">↺</button>
+        </div>
+      </div>
+      <div class="screen-body">
+
+        <p style="font-size:0.82rem; color:var(--gris-claro); margin-bottom:0.6rem;">Haz clic en cada tarjeta para revelar la respuesta. Ve una a una con toda la clase.</p>
+
+        <div class="cgrid c2">
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S1 · ¿Qué sabíamos de la IA antes de empezar?</div>
+            <div class="rcard-a">Hicimos un mapa de ideas previas. Cada uno anotó lo que asociaba con «inteligencia artificial». Había robots, películas, juegos… y la mayoría no sabíamos muy bien qué había detrás.</div>
+          </div>
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S2 · ¿Qué es un algoritmo?</div>
+            <div class="rcard-a">Jugamos al «juego del cartero»: repartir cartas siguiendo reglas exactas y fijas. Un algoritmo es una serie de instrucciones precisas que se ejecutan siempre igual para resolver un problema.</div>
+          </div>
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S3 · ¿En qué se diferencia programar de usar IA?</div>
+            <div class="rcard-a">Programar es escribir instrucciones fijas que la máquina sigue siempre igual. La IA aprende de ejemplos y puede dar respuestas diferentes. No sigue reglas escritas a mano: aprende patrones.</div>
+          </div>
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S4 · ¿Qué es un dato y por qué importa?</div>
+            <div class="rcard-a">Un dato es cualquier información: un número, una foto, una palabra, un sonido. Los datos son el «alimento» de la IA. Sin datos no puede aprender nada, y si los datos son malos, aprende mal.</div>
+          </div>
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S5 · ¿Qué pasó cuando dibujamos en Quick Draw?</div>
+            <div class="rcard-a">La IA intentaba adivinar nuestros dibujos en tiempo real. A veces acertaba, a veces fallaba. Había aprendido reconociendo millones de dibujos de personas de todo el mundo.</div>
+          </div>
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S6 · ¿Dónde encontramos IA en nuestra vida?</div>
+            <div class="rcard-a">En todas partes: recomendaciones de vídeos, desbloqueo por cara, filtros de foto, corrector del teclado, asistentes de voz, anuncios personalizados…</div>
+          </div>
+        </div>
+
+        <div class="cgrid" style="margin-top:0.6rem;">
+          <div class="rcard" onclick="this.classList.toggle('open')">
+            <div class="rcard-q">🃏 S7 · ¿Qué hacía NotebookLM diferente al resto de IAs?</div>
+            <div class="rcard-a">NotebookLM solo responde a partir de los documentos que nosotros le damos. No inventa, no busca en internet, no responde sobre otras cosas. Es una IA «con fuentes»: solo sabe lo que está en sus documentos.</div>
+          </div>
+        </div>
+
+        <div class="ndoc" style="margin-top:0.8rem;">
+          <div class="ndoc-ttl">💡 Nota docente — Pregunta de enganche para abrir la Fase 1</div>
+          Si NotebookLM solo puede usar lo que le damos nosotros… ¿qué pasa con una IA que puede responder sobre casi cualquier cosa? ¿Cómo sabe lo que queremos si no le hemos dado ningún documento?
+        </div>
+
+      </div>
+      <div class="lic">© Luis Gómez Peñalver · IA en primarIA · CEIP San Fernando · CC BY-NC-SA 4.0</div>
+    </div>
+
+    <!-- ───────────── FASE 1 · ¿QUÉ ES UN PROMPT? ───────────── -->
+    <div class="screen" id="screen-f1">
+      <div class="phase-hdr">
+        <div>
+          <div class="phase-label">FASE 1 &nbsp;·&nbsp; Gran grupo</div>
+          <div class="phase-name">💡 ¿Qué es un prompt?</div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-display" id="td-f1">8:00</div>
+          <button class="tbtn" onclick="toggleTimer('f1',480)">▶ / ⏸</button>
+          <button class="tbtn reset" onclick="resetTimer('f1',480)">↺</button>
+        </div>
+      </div>
+      <div class="screen-body">
+
+        <!-- Etimología -->
+        <div class="etym">
+          <div class="etym-title">📖 Curiosidad: ¿de dónde viene la palabra «prompt»?</div>
+          <div class="etym-body">
+            La palabra <strong style="color:var(--dorado);">prompt</strong> viene del latín <em>promptus</em>, que significa <strong>«tener algo listo», «preparado», «a mano»</strong>. En español, cuando algo es puntual o rápido decimos que es <strong>«pronto»</strong>… ¡y las dos palabras vienen de la misma raíz latina! En informática, un <em>prompt</em> era la señal que aparecía en pantalla pidiéndote que escribieras una instrucción. Con las IAs se usa para nombrar lo que le pedimos que tenga <strong>«listo» para nosotros</strong>.
+          </div>
+        </div>
+
+        <!-- Comparativa -->
+        <div class="stitle">📊 Prompt flojo vs. prompt construido</div>
+        <div class="cgrid c2">
+          <div class="cbox-bad">
+            <div class="cbox-label">❌ Prompt flojo</div>
+            <div class="cbox-prompt">«Háblame de los volcanes.»</div>
+            <div class="cbox-desc">La IA no sabe qué aspecto te interesa, para quién es ni cómo quieres la respuesta. Hará lo que pueda… que puede ser muy poco útil.</div>
+          </div>
+          <div class="cbox-good">
+            <div class="cbox-label">✅ Prompt construido</div>
+            <div class="cbox-prompt">«Explica cómo se forman los volcanes de Canarias para niños de 10 años, en una lista de 5 puntos, con palabras sencillas y un ejemplo al final.»</div>
+            <div class="cbox-desc">Le hemos dado 6 piezas de información. La IA sabe exactamente qué hacer.</div>
+          </div>
+        </div>
+
+        <!-- Las 6 piezas -->
+        <div class="stitle" style="margin-top:0.9rem;">🧩 Las 6 piezas de un buen prompt</div>
+        <div style="display:flex; flex-wrap:wrap; margin-bottom:0.5rem;">
+          <span class="ptag pt-accion">🎯 ACCIÓN — ¿qué quieres que haga?</span>
+          <span class="ptag pt-tema">📚 TEMA — ¿sobre qué exactamente?</span>
+          <span class="ptag pt-para">👤 PARA QUIÉN — ¿a quién va dirigido?</span>
+          <span class="ptag pt-formato">📏 FORMATO — ¿cómo quieres que lo presente?</span>
+          <span class="ptag pt-tono">🎭 TONO — ¿cómo quieres que suene?</span>
+          <span class="ptag pt-ext">📐 EXTENSIÓN — ¿cuánto quieres que se extienda?</span>
+        </div>
+
+        <div class="ndoc">
+          <div class="ndoc-ttl">💡 Nota docente — Diferencia clave con NotebookLM</div>
+          Gemini puede responder sobre casi todo, pero solo puede darte lo que tú sepas pedirle. No tiene un documento fijo del que tirar. Quien controla la calidad de la respuesta eres tú con tu instrucción.
+        </div>
+
+      </div>
+      <div class="lic">© Luis Gómez Peñalver · IA en primarIA · CEIP San Fernando · CC BY-NC-SA 4.0</div>
+    </div>
+
+    <!-- ───────────── FASE 2 · TALLER ANALÓGICO ───────────── -->
+    <div class="screen" id="screen-f2">
+      <div class="phase-hdr">
+        <div>
+          <div class="phase-label">FASE 2 &nbsp;·&nbsp; Pequeño grupo</div>
+          <div class="phase-name">🃏 Taller analógico: «La receta del buen prompt»</div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-display" id="td-f2">12:00</div>
+          <button class="tbtn" onclick="toggleTimer('f2',720)">▶ / ⏸</button>
+          <button class="tbtn reset" onclick="resetTimer('f2',720)">↺</button>
+        </div>
+      </div>
+      <div class="screen-body">
+
+        <!-- Vídeo de apoyo -->
+        <div style="background:rgba(220,38,38,0.1); border:2px solid rgba(220,38,38,0.4); border-radius:11px; padding:0.7rem 1rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.85rem;">
+          <div>
+            <div style="font-family:'Baloo 2',cursive; font-weight:700; color:#f87171; font-size:0.88rem;">🎬 Vídeo antes de empezar el taller</div>
+            <div style="font-size:0.75rem; color:var(--gris-claro);">«Exact Instructions Challenge» · Josh Darnit (versión para aulas) · ~3 min · muy visual</div>
+          </div>
+          <a href="https://www.youtube.com/watch?v=FN2RM-CHkuI" target="_blank" class="vbtn">▶ Ver en YouTube</a>
+        </div>
+
+        <div class="cgrid c2" style="margin-bottom:0.75rem;">
+          <div class="card">
+            <div class="card-head">📦 Material por pequeño grupo</div>
+            <ul style="font-size:0.8rem; line-height:1.85; padding-left:1rem;">
+              <li>24 tarjetas (6 categorías × 4)</li>
+              <li>1 ficha del alumnado por persona</li>
+              <li>Bolígrafo o lápiz</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-head">🎴 Las 6 categorías</div>
+            <div style="font-size:0.76rem; line-height:2;">
+              <span style="color:#60a5fa;">🎯 ACCIÓN</span> &nbsp;·&nbsp;
+              <span style="color:#34d399;">📚 TEMA</span> &nbsp;·&nbsp;
+              <span style="color:#a78bfa;">👤 PARA QUIÉN</span><br>
+              <span style="color:#fb923c;">📏 FORMATO</span> &nbsp;·&nbsp;
+              <span style="color:#f87171;">🎭 TONO</span> &nbsp;·&nbsp;
+              <span style="color:#9ca3af;">📐 EXTENSIÓN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stitle">📋 Pasos del taller</div>
+
+        <div class="step">
+          <div class="step-n">1</div>
+          <div>Coger una tarjeta de <strong style="color:#60a5fa;">ACCIÓN</strong> y una de <strong style="color:#34d399;">TEMA</strong>. Combinarlas para formar el <strong>prompt flojo</strong>. Escribirlo en la primera casilla de la ficha.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div>Añadir una tarjeta de <strong style="color:#a78bfa;">PARA QUIÉN</strong>, una de <strong style="color:#fb923c;">FORMATO</strong>, una de <strong style="color:#f87171;">TONO</strong> y una de <strong style="color:#9ca3af;">EXTENSIÓN</strong>. Construir el <strong>prompt completo</strong> con las 6 piezas y escribirlo en la segunda casilla.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div>Leer los dos prompts en voz alta dentro del pequeño grupo. Comentar: ¿qué le sobra al prompt flojo y qué le falta?</div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div>Practicar cómo dictarlo. En la Fase 3 el grupo saldrá a dictar sus dos prompts al docente en la pizarra.</div>
+        </div>
+
+        <div class="ndoc">
+          <div class="ndoc-ttl">💡 Nota docente — Gestión del tiempo</div>
+          Circular entre los grupos preguntando «¿para quién es?», «¿cómo quieres que suene?». Numerar los grupos para el orden de salida en Fase 3. Si un grupo termina antes, construir una segunda combinación con tarjetas distintas.
+        </div>
+
+      </div>
+      <div class="lic">© Luis Gómez Peñalver · IA en primarIA · CEIP San Fernando · CC BY-NC-SA 4.0</div>
+    </div>
+
+    <!-- ───────────── FASE 3 · A LA PIZARRA ───────────── -->
+    <div class="screen" id="screen-f3">
+      <div class="phase-hdr">
+        <div>
+          <div class="phase-label">FASE 3 &nbsp;·&nbsp; Turnos por pequeño grupo</div>
+          <div class="phase-name">🖥️ A la pizarra: Gemini en acción</div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-display" id="td-f3">15:00</div>
+          <button class="tbtn" onclick="toggleTimer('f3',900)">▶ / ⏸</button>
+          <button class="tbtn reset" onclick="resetTimer('f3',900)">↺</button>
+        </div>
+      </div>
+      <div class="screen-body">
+
+        <div style="background:rgba(245,158,11,0.12); border:2px solid var(--dorado); border-radius:11px; padding:0.7rem 1rem; margin-bottom:0.75rem; font-size:0.83rem; line-height:1.5;">
+          🎯 <strong>Objetivo:</strong> Comparar en directo la respuesta a un prompt flojo y a un prompt construido, con Gemini proyectado. El alumnado observa, anota en su ficha y participa oralmente. El docente escribe y envía.
+        </div>
+
+        <div class="stitle">🔄 Secuencia de cada turno</div>
+
+        <div class="step">
+          <div class="step-n">1</div>
+          <div>El grupo sale a la pizarra y <strong>dicta su prompt flojo</strong>. El docente lo escribe en Gemini y envía. El alumnado no toca el teclado.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div>Se lee la respuesta en voz alta. Toda la clase <strong>anota en su ficha</strong> qué les llama la atención de esa respuesta.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div>El mismo grupo dicta ahora su <strong>prompt construido</strong> (con las 6 piezas). El docente lo escribe y envía.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div>Se leen las dos respuestas juntas. Preguntas al grupo y a la clase: <em style="color:var(--dorado);">«¿Qué cambió?»</em> y <em style="color:var(--dorado);">«¿Qué pieza del prompt marcó más la diferencia?»</em></div>
+        </div>
+        <div class="step">
+          <div class="step-n">5</div>
+          <div>El grupo vuelve a su sitio. Sale el siguiente grupo y se repite la secuencia.</div>
+        </div>
+
+        <div class="ndoc">
+          <div class="ndoc-ttl">💡 Nota docente — Gestión de respuestas inesperadas</div>
+          Si Gemini da una respuesta muy larga, seleccionar el fragmento más relevante y leerlo. Si la respuesta no encaja bien, convertirla en material de reflexión: «¿Por qué creéis que respondió esto?». Tener dos prompts de reserva ya probados por si algún grupo se bloquea.
+        </div>
+
+      </div>
+      <div class="lic">© Luis Gómez Peñalver · IA en primarIA · CEIP San Fernando · CC BY-NC-SA 4.0</div>
+    </div>
+
+    <!-- ───────────── FASE 4 · CIERRE ───────────── -->
+    <div class="screen" id="screen-f4">
+      <div class="phase-hdr">
+        <div>
+          <div class="phase-label">FASE 4 &nbsp;·&nbsp; Gran grupo + trabajo individual</div>
+          <div class="phase-name">⭐ Cierre: las reglas de oro del prompt</div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-display" id="td-f4">8:00</div>
+          <button class="tbtn" onclick="toggleTimer('f4',480)">▶ / ⏸</button>
+          <button class="tbtn reset" onclick="resetTimer('f4',480)">↺</button>
+        </div>
+      </div>
+      <div class="screen-body">
+
+        <p style="font-size:0.82rem; color:var(--gris-claro); margin-bottom:0.6rem;">Haz clic en cada regla para revelarla con el grupo:</p>
+
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">🎯</div>
+          <div class="regla-body">
+            <strong>Di qué quieres que haga la IA.</strong>
+            <div class="regla-sub">Sin una acción clara (explica, escribe, resume, compara…) la IA no sabe por dónde empezar. Es la pieza más importante.</div>
+          </div>
+        </div>
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">📚</div>
+          <div class="regla-body">
+            <strong>Cuéntale exactamente de qué tema.</strong>
+            <div class="regla-sub">«Los animales» es vago. «Los animales que viven en el fondo del mar» es un tema. Cuanto más preciso, mejor respuesta.</div>
+          </div>
+        </div>
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">👤</div>
+          <div class="regla-body">
+            <strong>Explícale para quién es la respuesta.</strong>
+            <div class="regla-sub">La IA adapta el nivel y el vocabulario según le digas para quién escribe. Sin esta información, elige ella sola… y puede no acertar.</div>
+          </div>
+        </div>
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">📏</div>
+          <div class="regla-body">
+            <strong>Dile cómo quieres que te lo presente.</strong>
+            <div class="regla-sub">Lista, párrafo, pregunta y respuesta, con un ejemplo… El formato cambia completamente cómo se puede usar la respuesta.</div>
+          </div>
+        </div>
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">🎭</div>
+          <div class="regla-body">
+            <strong>Indícale el tono que necesitas.</strong>
+            <div class="regla-sub">Divertido, serio, como un amigo, con datos sorprendentes… La misma información suena completamente diferente según el tono.</div>
+          </div>
+        </div>
+        <div class="regla" onclick="this.classList.toggle('open')">
+          <div class="regla-e">📐</div>
+          <div class="regla-body">
+            <strong>Dile cuánto quieres que se extienda.</strong>
+            <div class="regla-sub">Sin un límite, la IA decide sola… y a veces escribe demasiado. «En 5 frases» o «en 3 puntos» es una de las instrucciones más útiles.</div>
+          </div>
+        </div>
+
+        <div class="reflex">
+          ✏️ <strong>En tu ficha:</strong> «¿Qué le faltaba a la pregunta floja? ¿Y qué cambiarías en el prompt de tu grupo si pudieras repetirlo?»
+        </div>
+
+        <!-- Puente a S9 — conexión activa -->
+        <div class="next-card">
+          <div class="next-title">🔭 Antes de la S9 — una contradicción que te vas a llevar a casa</div>
+          <p style="font-size:0.82rem; line-height:1.5; margin-bottom:0.7rem;">
+            Hoy hemos aprendido a <strong>controlar a Gemini con palabras</strong>: si la instrucción es precisa, la respuesta mejora. Le hemos dicho «explica para un niño de 10 años, en tono divertido, en 5 frases» y lo ha hecho.
+          </p>
+          <p style="font-size:0.82rem; line-height:1.5; margin-bottom:0.75rem;">
+            Pero espera. Para hacer eso… ¿necesita Gemini <em>entender</em> qué es un niño de 10 años? ¿Sabe lo que es el humor? ¿O simplemente ha visto millones de textos y sabe qué palabras suelen ir juntas?
+          </p>
+
+          <!-- Tarjetas de tensión conceptual -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.75rem;">
+            <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.5); border-radius:9px; padding:0.6rem 0.75rem; font-size:0.78rem; line-height:1.5;">
+              <div style="font-family:'Baloo 2',cursive; font-weight:700; color:var(--dorado); margin-bottom:0.25rem;">🤔 Postura A</div>
+              Gemini <strong>entiende</strong> nuestras palabras. Por eso responde bien cuando le explicamos bien. Es inteligente.
+            </div>
+            <div style="background:rgba(37,99,192,0.2); border:1px solid rgba(37,99,192,0.5); border-radius:9px; padding:0.6rem 0.75rem; font-size:0.78rem; line-height:1.5;">
+              <div style="font-family:'Baloo 2',cursive; font-weight:700; color:#60a5fa; margin-bottom:0.25rem;">🤖 Postura B</div>
+              Gemini <strong>no entiende nada</strong>. Solo predice qué palabra va después de la anterior, millones de veces. El resultado parece inteligente, pero no lo es.
+            </div>
+          </div>
+
+          <!-- Reveal: pista -->
+          <div class="rcard" onclick="this.classList.toggle('open')" style="margin-bottom:0.6rem; border-color:rgba(245,158,11,0.4);">
+            <div class="rcard-q" style="font-size:0.8rem;">🔍 Haz clic aquí para ver una pista antes de la S9</div>
+            <div class="rcard-a">Las dos posturas tienen algo de razón. Gemini no «entiende» como lo hacemos nosotros, pero tampoco es solo una máquina de predecir palabras. En la S9 vamos a ver exactamente qué está pasando dentro, y vosotros vais a tener que defender una postura con argumentos.</div>
+          </div>
+
+          <div style="background:rgba(245,158,11,0.15); border-left:3px solid var(--dorado); padding:0.55rem 0.75rem; border-radius:0 8px 8px 0; font-size:0.8rem; line-height:1.5;">
+            ✏️ <strong>En tu ficha — Pregunta para la S9:</strong> escribe <em>en una frase</em> qué crees tú: ¿Gemini entiende lo que le preguntamos, o solo predice? Guárdala. La semana que viene la necesitarás.
+          </div>
+        </div>
+
+        <!-- Película -->
+        <div class="movie-card">
+          <div class="movie-title">🎬 TRON: Legacy (2010)</div>
+          <div class="movie-tag">🎥 Película recomendada · Apta para todos los públicos</div>
+          <p class="movie-body">
+            En el mundo del Grid —el universo digital creado dentro de un ordenador—, cada programa que existe fue diseñado por un usuario humano que le dio sus instrucciones. Sam Flynn entra en ese mundo para encontrar a su padre Kevin, el programador que lo creó todo. El gran conflicto surge con <strong>Clu</strong>, un programa que Kevin diseñó con una misión concreta: construir el mundo perfecto. El problema es que Clu siguió esas instrucciones de una manera que su creador nunca imaginó, porque las instrucciones no decían con exactitud todo lo que Kevin quería decir.
+            <br><br>La lección que conecta con nuestra sesión: <strong>detrás de cada IA hay un ser humano que escribió las instrucciones</strong>. Y si esas instrucciones no son precisas, los resultados pueden sorprenderte… o preocuparte.
+          </p>
+          <div class="movie-q">
+            💭 <strong>Pregunta para pensar:</strong> Si fueras Kevin Flynn y tuvieras que darle instrucciones a un programa para que construyera «el mundo perfecto»… ¿qué escribirías exactamente? ¿Cómo de difícil es poner en palabras lo que de verdad queremos?
+          </div>
+        </div>
+
+      </div>
+      <div class="lic" style="font-size:0.62rem; line-height:1.6;">
+        © Luis Gómez Peñalver · CEIP San Fernando, Fuente del Rey, Dos Hermanas (Sevilla) · 2026<br>
+        Proyecto IA en primarIA · Este material se distribuye bajo licencia CC BY-NC-SA 4.0
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- ══════════ JAVASCRIPT ══════════ -->
+  <script>
+    // ── NAVIGATION ──────────────────────────────
+    const SCREENS = ['cover','f0','f1','f2','f3','f4'];
+
+    function goTo(id) {
+      SCREENS.forEach(s => {
+        document.getElementById('screen-' + s).classList.remove('active');
+        const t = document.getElementById('tab-' + s);
+        if (t) t.classList.remove('active');
+      });
+      document.getElementById('screen-' + id).classList.add('active');
+      const t = document.getElementById('tab-' + id);
+      if (t) t.classList.add('active');
+      // Alert bar only on Fase 3
+      document.getElementById('alertBar').classList.toggle('on', id === 'f3');
+    }
+
+    // ── TIMERS ──────────────────────────────────
+    const timers = {};
+
+    function fmt(s) {
+      return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
+    }
+
+    function toggleTimer(phase, def) {
+      if (!timers[phase]) timers[phase] = { rem: def, running: false, iv: null };
+      const t = timers[phase];
+      if (t.running) {
+        clearInterval(t.iv);
+        t.running = false;
+      } else {
+        if (t.rem <= 0) t.rem = def;
+        t.running = true;
+        t.iv = setInterval(() => {
+          if (t.rem > 0) {
+            t.rem--;
+            const el = document.getElementById('td-' + phase);
+            el.textContent = fmt(t.rem);
+            el.classList.toggle('urgent', t.rem <= 60);
+          } else {
+            clearInterval(t.iv);
+            t.running = false;
+            document.getElementById('td-' + phase).textContent = '⏰ ¡Tiempo!';
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer(phase, def) {
+      if (timers[phase]) { clearInterval(timers[phase].iv); timers[phase] = null; }
+      const el = document.getElementById('td-' + phase);
+      el.textContent = fmt(def);
+      el.classList.remove('urgent');
+    }
+  </script>
+
+</body>
+</html>
